@@ -37,10 +37,20 @@ const updateById = async (req, res) => {
   checkResult(result, res);
 };
 
+const toggleFavoriteContact = async (req, res) => {
+  const { id } = req.params;
+  const result = await contactsServices.toggleFavoriteByIdContact(id, req.body);
+  if (!result) {
+    throw HttpError(404);
+  }
+  res.status(200).json(result);
+};
+
 export default {
   getAllContacts: ctrlWrapper(getAllContacts),
   getById: ctrlWrapper(getById),
   createContact: ctrlWrapper(createContact),
   updateById: ctrlWrapper(updateById),
   deleteById: ctrlWrapper(deleteById),
+  toggleFavoriteContact: ctrlWrapper(toggleFavoriteContact),
 };

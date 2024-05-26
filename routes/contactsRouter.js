@@ -5,13 +5,15 @@ import validateBody from "../decorators/validateBody.js";
 import {
   contactAddSchema,
   contactUpdateSchema,
+  contactToggleFavoriteSchema,
 } from "../schemas/contactsSchemas.js";
+import isValidId from "../middlewares/isValidId.js";
 
 const contactsRouter = express.Router();
 
 contactsRouter.get("/", contactsControllers.getAllContacts);
 
-contactsRouter.get("/:id", contactsControllers.getById);
+contactsRouter.get("/:id", isValidId, contactsControllers.getById);
 
 contactsRouter.post(
   "/",
@@ -22,11 +24,19 @@ contactsRouter.post(
 
 contactsRouter.put(
   "/:id",
+  isValidId,
   isEmptyBody,
   validateBody(contactUpdateSchema),
   contactsControllers.updateById
 );
 
-contactsRouter.delete("/:id", contactsControllers.deleteById);
+contactsRouter.patch(
+  "/:id/favorite",
+  isValidId,
+  validateBody(contactToggleFavoriteSchema),
+  contactsControllers.toggleFavoriteContact
+);
+
+contactsRouter.delete("/:id", isValidId, contactsControllers.deleteById);
 
 export default contactsRouter;
