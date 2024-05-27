@@ -5,17 +5,14 @@ export const listContacts = (search = {}) => {
   return Contact.find(filter, fields);
 };
 
-export const getContactById = async (_id) => {
-  const result = await Contact.findById(_id);
-};
+export const getContactById = (_id) => Contact.findById(_id);
 
-export const removeContact = async (_id) => Contact.findByIdAndDelete(_id);
+export const removeContact = (_id) => Contact.findByIdAndDelete(_id);
 
 export const addContact = (data) => Contact.create(data);
 
-export const updateContactById = async (id, data) =>
+export const updateContactById = (id, data) =>
   Contact.findByIdAndUpdate(id, data);
 
-export const toggleFavoriteByIdContact = (_id, favorite) => {
-  return Contact.findByIdAndUpdate(_id, favorite);
-};
+export const toggleFavoriteByIdContact = (_id, favorite) =>
+  Contact.findByIdAndUpdate(_id, favorite);
