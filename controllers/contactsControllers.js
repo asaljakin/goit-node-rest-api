@@ -9,37 +9,63 @@ const checkResult = (result, res) => {
   res.json(result);
 };
 
-const getAllContacts = async (_, res) => {
-  const result = await contactsServices.listContacts();
+const getAllContacts = async (req, res) => {
+  const { _id: owner } = req.user;
+  const filter = { owner };
+  const fields = "-createdAt -updatedAt";
+  const { page = 1, limit = 20, favorite = undefined } = req.query;
+  const skip = (page - 1) * limit;
+  const settings = { skip, limit };
+  if (favorite !== undefined) {
+    filter.favorite = favorite;
+  }
+
+  const result = await contactsServices.listContacts({
+    filter,
+    fields,
+    settings,
+  });
   res.json(result);
 };
 
 const getById = async (req, res) => {
-  const { id } = req.params;
-  const result = await contactsServices.getContactById(id);
+  const { id: _id } = req.params;
+  const { _id: owner } = req.user;
+  filter = { _id, owner };
+  const result = await contactsServices.getContactById(filter);
   checkResult(result, res);
 };
 
 const deleteById = async (req, res) => {
-  const { id } = req.params;
-  const result = await contactsServices.removeContact(id);
+  const { id: _id } = req.params;
+  const { _id: owner } = req.user;
+  filter = { _id, owner };
+  const result = await contactsServices.removeContact(filter);
   checkResult(result, res);
 };
 
 const createContact = async (req, res) => {
-  const result = await contactsServices.addContact(req.body);
+  const { _id: owner } = req.user;
+  const result = await contactsServices.addContact({ ...req.body, owner });
   res.status(201).json(result);
 };
 
 const updateById = async (req, res) => {
-  const { id } = req.params;
-  const result = await contactsServices.updateContactById(id, req.body);
+  const { id: _id } = req.params;
+  const { _id: owner } = req.user;
+  filter = { _id, owner };
+  const result = await contactsServices.updateContactById(filter, req.body);
   checkResult(result, res);
 };
 
 const toggleFavoriteContact = async (req, res) => {
-  const { id } = req.params;
-  const result = await contactsServices.toggleFavoriteByIdContact(id, req.body);
+  const { id: _id } = req.params;
+  const { _id: owner } = req.user;
+  filter = { _id, owner };
+  const result = await contactsServices.toggleFavoriteByIdContact(
+    filter,
+    req.body
+  );
   if (!result) {
     throw HttpError(404);
   }
