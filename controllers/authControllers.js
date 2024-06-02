@@ -10,6 +10,7 @@ import compareHash from "../helpers/compareHash.js";
 import { createToken } from "../helpers/jwt.js";
 import { SUPPORTED_IMAGE_TYPES } from "../constants/contacts-constants.js";
 import sendEmail from "../helpers/sendEmail.js";
+import { log } from "console";
 
 const avatarsPath = path.resolve("public", "avatars");
 
@@ -30,7 +31,7 @@ const register = async (req, res) => {
   const verifyEmail = {
     to: email,
     subject: "Email verification",
-    html: `<a target="_blank" href="http://localhost:3000/users/verify/${verificationToken}">Click to verify email</a>`,
+    html: `<a target="_blank" href="http://localhost:3000/users/verify/:${verificationToken}">Click to verify email</a>`,
   };
   await sendEmail(verifyEmail);
 
@@ -52,7 +53,10 @@ const verify = async (req, res) => {
 
   await authServices.updateUser(
     { _id: user._id },
-    { verify: true, verificationToken: null }
+    {
+      verify: true,
+      verificationToken: null,
+    }
   );
 
   res.json({
