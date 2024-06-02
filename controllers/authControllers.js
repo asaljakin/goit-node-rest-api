@@ -7,6 +7,7 @@ import ctrlWrapper from "../decorators/ctrlWrapper.js";
 import HttpError from "../helpers/HttpError.js";
 import compareHash from "../helpers/compareHash.js";
 import { createToken } from "../helpers/jwt.js";
+import { SUPPORTED_IMAGE_TYPES } from "../constants/contacts-constants.js";
 
 const avatarsPath = path.resolve("public", "avatars");
 
@@ -84,11 +85,17 @@ const updateSubscription = async (req, res) => {
 
 const updateAvatar = async (req, res) => {
   const { _id, email } = req.user;
-  const { path: oldPath, filename } = req.file;
+  if (!req.file) {
+    throw HttpError(400, "Image not found");
+  }
+  const { path: oldPath, filename, mimetype } = req.file;
+  if (!SUPPORTED_IMAGE_TYPES.includes(mimetype)) {
+    throw HttpError(400, "Unsupported file type");
+  }
   const newPath = path.join(avatarsPath, filename);
   await images.convertedImage(oldPath, newPath);
   await fs.unlink(oldPath);
-  const avatarURL = path.resolve("avatars", filename);
+  const avatarURL = path.join("avatars", filename);
   await authServices.updateUser({ _id }, { avatarURL });
 
   res.json({
