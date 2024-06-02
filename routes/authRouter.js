@@ -6,6 +6,7 @@ import {
   userRegisterSchema,
   userLoginSchema,
   userSubscriptionSchema,
+  userEmailSchema,
 } from "../schemas/authSchemas.js";
 import authenticate from "../middlewares/authenticate.js";
 import upload from "../middlewares/upload.js";
@@ -17,6 +18,15 @@ authRouter.post(
   validateBody(userRegisterSchema),
   authControllers.register
 );
+
+authRouter.post(
+  "/verify",
+  isEmptyBody,
+  validateBody(userEmailSchema),
+  authControllers.resendVerify
+);
+
+authRouter.get("/verify/:verificationToken", authControllers.verify);
 
 authRouter.post(
   "/login",
@@ -43,4 +53,5 @@ authRouter.patch(
   upload.single("avatar"),
   authControllers.updateAvatar
 );
+
 export default authRouter;
